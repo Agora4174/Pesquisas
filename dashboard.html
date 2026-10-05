@@ -6,7 +6,6 @@
     <title>Dashboard - Pesquisa de Satisfação - Alpha Instituto</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <style>
-    <style>
         * {
             margin: 0;
             padding: 0;
@@ -531,12 +530,11 @@
         .success-message.show {
             display: block;
         }
-    </style>
         .page{display:block!important} @media print{.btn{display:none}}
-</style>
+    </style>
 </head>
 <body>
-<div class="header"><div class="header-content"><div class="logo-section"><h1>ALPHA INSTITUTO</h1><p>Dashboard de Satisfação</p></div></div></div>
+<div class="header"><div class="header-content"><div class="logo-section"><h1>𝛂 ALPHA INSTITUTO</h1><p>Dashboard de Satisfação</p></div></div></div>
     <div class="container">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px"><h2 style="color:#1B5E6E">📊 Dashboard de Análises</h2><div><button class="btn btn-primary" onclick="loadData(true)">🔄 Atualizar dados</button> <button class="btn btn-secondary" onclick="logout()">Sair</button></div></div><div id="status" style="margin-bottom:15px;color:#555"></div>
 
@@ -605,10 +603,9 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <script>
-        // >>> URL do Apps Script (a mesma do formulário)
+        // URL do App da Web do Apps Script (a mesma do formulário)
         const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzyh4Ft-JNakYtgikpMjoZCkzEUzQwSptNyBkOzEgr6NpU__CHevXxO8LMpny-WSlBE/exec';
         const ASP = ['tempo','qualidade','acomodacao','nutricao'];
         const ASP_L = ['Tempo','Qualidade','Acomodação','Nutrição'];
