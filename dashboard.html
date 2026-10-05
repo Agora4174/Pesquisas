@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Pesquisa de Satisfação - Alpha Instituto</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1B5E6E 0%, #2a7a8c 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Menu Navigation */
+        .menu-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid transparent;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .menu-btn.active {
+            background: white;
+            color: #1B5E6E;
+            border-color: white;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Survey Page */
+        .info-box {
+            background-color: #1B5E6E;
+            color: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .info-box h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #1B5E6E;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1B5E6E;
+        }
+
+        .ratings-header p {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .emoji-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .emoji-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .emoji {
+            font-size: 40px;
+            transition: transform 0.2s;
+        }
+
+        .emoji-option:hover .emoji {
+            transform: scale(1.1);
+        }
+
+        .emoji-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1B5E6E;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 30px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        table th {
+            background-color: #1B5E6E;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .aspect-name {
+            font-weight: 600;
+            color: #1B5E6E;
+        }
+
+        .aspect-description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .rating-circle {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .rating-circle:hover {
+            border-color: #1B5E6E;
+            background-color: #f0f0f0;
+        }
+
+        .rating-circle.selected {
+            background-color: #1B5E6E;
+            border-color: #1B5E6E;
+        }
+
+        .comments-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 6px;
+            border-left: 4px solid #1B5E6E;
+        }
+
+        .comments-section textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+
+        .comments-section textarea:focus {
+            outline: none;
+            border-color: #1B5E6E;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: #1B5E6E;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #154654;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 94, 110, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #1B5E6E;
+            border: 2px solid #1B5E6E;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e8e8e8;
+        }
+
+        /* Dashboard Page */
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid #1B5E6E;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1B5E6E;
+        }
+
+        .stat-card .subtext {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chart-box h3 {
+            color: #1B5E6E;
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .chart-box canvas {
+            max-height: 300px;
+        }
+
+        /* Report Page */
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .report-header h2 {
+            color: #1B5E6E;
+            margin-bottom: 10px;
+        }
+
+        .report-period {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .report-section {
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #1B5E6E;
+        }
+
+        .report-section h3 {
+            color: #1B5E6E;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .report-table th {
+            background-color: #1B5E6E;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .report-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .report-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .print-btn {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1B5E6E;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .menu-nav {
+                flex-wrap: wrap;
+            }
+
+            .menu-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .page {
+                padding: 20px;
+            }
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+        .page{display:block!important} @media print{.btn{display:none}}
+</style>
+</head>
+<body>
+<div class="header"><div class="header-content"><div class="logo-section"><h1>𝛂 ALPHA INSTITUTO</h1><p>Dashboard de Satisfação</p></div></div></div>
+    <div class="container">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px"><h2 style="color:#1B5E6E">📊 Dashboard de Análises</h2><div><button class="btn btn-primary" onclick="loadData(true)">🔄 Atualizar dados</button> <button class="btn btn-secondary" onclick="logout()">Sair</button></div></div><div id="status" style="margin-bottom:15px;color:#555"></div>
+
+            <div class="filters">
+                <div class="form-group">
+                    <label>Filtrar por Mês:</label>
+                    <select id="filterMonth" onchange="updateDashboard()">
+                        <option value="">Todos os meses</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Filtrar por Ano:</label>
+                    <select id="filterYear" onchange="updateDashboard()">
+                        <option value="">Todos os anos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Período Personalizado De:</label>
+                    <input type="date" id="dateFrom" onchange="updateDashboard()">
+                </div>
+                <div class="form-group">
+                    <label>Até:</label>
+                    <input type="date" id="dateTo" onchange="updateDashboard()">
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total de Pesquisas</h3>
+                    <div class="value" id="totalSurveys">0</div>
+                    <div class="subtext">Pesquisas respondidas</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Taxa de Satisfação</h3>
+                    <div class="value" id="satisfactionRate">0%</div>
+                    <div class="subtext">Ótimo + Bom</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Avaliação Média</h3>
+                    <div class="value" id="averageRating">0</div>
+                    <div class="subtext">de 5.0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Taxa de Reclamações</h3>
+                    <div class="value" id="complaintRate">0%</div>
+                    <div class="subtext">Ruim + Péssimo</div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h3>Distribuição Geral de Avaliações</h3>
+                    <canvas id="overallChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3>Avaliações por Aspecto</h3>
+                    <canvas id="aspectsChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3>Tendência Temporal</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3>Satisfação por Aspecto (%)</h3>
+                    <canvas id="satisfactionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // >>> URL do Apps Script (a mesma do formulário)
+        const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyEB9Sf7Fpq6TIy4Ik8snXDVcDJLRA1Iq7UokHQoePi3h4LeThJHhPIFQ5M92jiiDvKGQ/exec';
+        const ASP = ['tempo','qualidade','acomodacao','nutricao'];
+        const ASP_L = ['Tempo','Qualidade','Acomodação','Nutrição'];
+        const RAT = ['Ótimo','Bom','Regular','Ruim','Péssimo'];
+        const COR = ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6'];
+        const SC = {Ótimo:5,Bom:4,Regular:3,Ruim:2,Péssimo:1};
+        let surveys = [], charts = {};
+        const $ = id => document.getElementById(id);
+
+        function parseCSV(t) {
+            const rows = []; let r = [], c = '', q = false;
+            for (let i = 0; i < t.length; i++) {
+                const ch = t[i];
+                if (q) { if (ch === '"') { if (t[i+1] === '"') { c += '"'; i++; } else q = false; } else c += ch; }
+                else if (ch === '"') q = true;
+                else if (ch === ',') { r.push(c); c = ''; }
+                else if (ch === '\n') { r.push(c); rows.push(r); r = []; c = ''; }
+                else if (ch !== '\r') c += ch;
+            }
+            if (c || r.length) { r.push(c); rows.push(r); }
+            return rows;
+        }
+        function logout() { sessionStorage.removeItem('tk'); location.reload(); }
+
+        async function loadData(force) {
+            let tk = sessionStorage.getItem('tk');
+            if (!tk || force && !tk) tk = prompt('Digite a senha (token) do dashboard:');
+            if (!tk) { $('status').textContent = 'Senha necessária.'; return; }
+            $('status').textContent = 'Carregando dados...';
+            try {
+                const res = await fetch(ENDPOINT + '?token=' + encodeURIComponent(tk));
+                const txt = await res.text();
+                if (txt.trim() === 'acesso negado') { sessionStorage.removeItem('tk'); $('status').textContent = 'Senha incorreta. Clique em Atualizar dados e tente de novo.'; return; }
+                sessionStorage.setItem('tk', tk);
+                const rows = parseCSV(txt); const h = rows.shift() || [];
+                surveys = rows.filter(r => r.length > 4).map(r => { const o = {}; h.forEach((k,i) => o[k] = r[i]); return o; });
+                $('status').textContent = surveys.length + ' respostas carregadas • atualizado às ' + new Date().toLocaleTimeString('pt-BR');
+                fillFilters(); updateDashboard();
+            } catch (e) { $('status').textContent = 'Erro ao carregar os dados. Verifique a internet e a implantação do Apps Script.'; }
+        }
+        const dt = s => new Date(s.timestamp);
+        function fillFilters() {
+            const m = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            const ms = $('filterMonth'), ys = $('filterYear');
+            ms.innerHTML = '<option value="">Todos os meses</option>' + m.map((n,i) => `<option value="${i}">${n}</option>`).join('');
+            const anos = [...new Set(surveys.map(s => dt(s).getFullYear()).filter(Boolean))].sort();
+            ys.innerHTML = '<option value="">Todos os anos</option>' + anos.map(a => `<option>${a}</option>`).join('');
+        }
+        function filtered() {
+            const m = $('filterMonth').value, y = $('filterYear').value, f = $('dateFrom').value, t = $('dateTo').value;
+            return surveys.filter(s => { const d = dt(s);
+                if (m && d.getMonth() != m) return false; if (y && d.getFullYear() != y) return false;
+                if (f && d < new Date(f)) return false; if (t && d > new Date(t + 'T23:59:59')) return false; return true; });
+        }
+        function updateDashboard() {
+            const f = filtered(), n = f.length * 4, cnt = {};
+            RAT.forEach(r => cnt[r] = 0); let score = 0;
+            f.forEach(s => ASP.forEach(a => { if (cnt[s[a]] !== undefined) { cnt[s[a]]++; score += SC[s[a]]; } }));
+            $('totalSurveys').textContent = f.length;
+            $('satisfactionRate').textContent = n ? Math.round((cnt.Ótimo + cnt.Bom) / n * 100) + '%' : '0%';
+            $('complaintRate').textContent = n ? Math.round((cnt.Ruim + cnt.Péssimo) / n * 100) + '%' : '0%';
+            $('averageRating').textContent = n ? (score / n).toFixed(2) : '0';
+            Object.values(charts).forEach(c => c.destroy()); charts = {};
+            charts.o = new Chart($('overallChart'), { type: 'doughnut', data: { labels: RAT, datasets: [{ data: RAT.map(r => cnt[r]), backgroundColor: COR }] }, options: { plugins: { legend: { position: 'bottom' } } } });
+            charts.a = new Chart($('aspectsChart'), { type: 'bar', data: { labels: ASP_L, datasets: RAT.map((r,i) => ({ label: r, backgroundColor: COR[i], data: ASP.map(a => f.filter(s => s[a] === r).length) })) }, options: { scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } } } });
+            const dia = {}; f.forEach(s => { const k = dt(s).toISOString().slice(0,10); dia[k] = (dia[k] || 0) + 1; });
+            const ds = Object.keys(dia).sort();
+            charts.t = new Chart($('trendChart'), { type: 'line', data: { labels: ds.map(d => d.split('-').reverse().join('/')), datasets: [{ label: 'Pesquisas por Dia', data: ds.map(d => dia[d]), borderColor: '#1B5E6E', tension: .3 }] }, options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } });
+            charts.s = new Chart($('satisfactionChart'), { type: 'bar', data: { labels: ASP_L, datasets: [{ label: 'Taxa de Satisfação (%)', backgroundColor: '#10b981', data: ASP.map(a => f.length ? Math.round(f.filter(s => s[a] === 'Ótimo' || s[a] === 'Bom').length / f.length * 100) : 0) }] }, options: { scales: { y: { beginAtZero: true, max: 100 } } } });
+        }
+        loadData();
+    </script>
+</body>
+</html>
